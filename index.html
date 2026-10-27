@@ -166,6 +166,15 @@ body.dragnow{user-select:none;-webkit-user-select:none;cursor:grabbing}
 .why{max-width:520px;margin:4px auto 14px;text-align:left;font-size:16px;line-height:1.7;background:#f3fbfb;border:2px solid #9fd8d8;border-radius:12px;padding:10px 14px;color:#2b3a3a}
 .why b{display:block;color:#0b7d7d;margin-bottom:2px}
 .wrongfig .pv{min-height:170px}
+/* 共通の部分の練習：ページ切り替えタブと、3ページを並べた説明 */
+.pgtabs{display:flex;gap:4px;margin:0 0 6px;flex-wrap:wrap}
+.pgtab{border:2px solid #c5d2e6;border-bottom-width:3px;background:#f3f6fb;border-radius:10px 10px 4px 4px;padding:2px 7px;font-size:13px;font-weight:bold;color:#5b6f8f;white-space:nowrap}
+.pgtab[aria-selected="true"]{background:#fff;border-color:#0fa3a3;color:#0b7d7d}
+.pgtab.seen::after{content:" ✔";color:#389438}
+.pagesfig{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pagesfig h3{margin:0 0 4px;font-size:14px;color:#575e75}
+.pagesfig .pv{min-height:150px;font-size:12px}
+@media (max-width:600px){ .pagesfig{grid-template-columns:minmax(0,1fr)} }
 /* デザインを付ける：実際のサイトのように、箱ごとに見た目を決める（CSS の役割の体験） */
 .pv.design{padding:0;background:#eef1f5;display:flex;flex-direction:column}
 .pv.design > .sfit{display:flex;flex-direction:column;flex:1 0 auto}
@@ -469,7 +478,6 @@ function loadProg(){
   if (typeof p !== 'object' || !p) p = {};
   if (!p.cleared || typeof p.cleared !== 'object') p.cleared = {};
   if (typeof p.furi !== 'boolean') p.furi = false;
-  if (typeof p.boxes !== 'boolean') p.boxes = false;
   if (typeof p.design !== 'boolean') p.design = true;
   return p;
 }
@@ -650,15 +658,20 @@ const STAGES = [
   {id:'9', k:'p', n:'9', icon:'🧩', title:'{組|く}み{立|た}て', goal:'{見本|みほん}と{同|おな}じ{並|なら}びにしましょう', robot:'{見本|みほん}と{見比|みくら}べながら{作|つく}りましょう', tray:ALL, cmp:true, target:'sample', sample:[['h1','私のページ'],['img','flower'],['p','はじめまして。'],['h2','好きなもの'],['ul',['おにぎり','花','音楽']],['a',['好きなサイト','https://example.com']]]},
   {id:'10',k:'p', n:'10',icon:'🌟', title:'{自己紹介|じこしょうかい}ページ', goal:'{自分|じぶん}の{自己紹介|じこしょうかい}ページを{自由|じゆう}に{作|つく}りましょう', robot:'4{種類|しゅるい}{以上|いじょう}の{部品|ぶひん}を{使|つか}ってください', tray:ALL, free:4, sample:[['h1','○○のページ'],['img','star'],['p','こんにちは。'],['h2','好きなこと'],['ul',['散歩','映画','料理']],['hr'],['strong','よろしくお願いします！']]},
   // 箱ブロック編：ページを「上部・主な内容・下部」の箱に分ける（tree：箱の中身まで含めて答え合わせ）
-  {id:'11',k:'p', n:'11',icon:'📦', title:'ページの{骨組|ほねぐ}み', goal:'3つの{箱|はこ}を{上|うえ}から{順|じゅん}に{並|なら}べましょう', robot:'{右|みぎ}の「デザインを{付|つ}ける」で、{箱|はこ}ごとに{見|み}た{目|め}が{変|か}わります。「{箱|はこ}を{表示|ひょうじ}」で{箱|はこ}の{形|かたち}も{確認|かくにん}できます', tray:BOXES, newT:BOXES, boxFig:true, showBoxes:true, tree:true,
-    why:'{箱|はこ}だけでは{画面|がめん}は{変|か}わりませんが、デザイン（CSS）は{箱|はこ}ごとに{付|つ}けられます。「ここからここまでが{上部|じょうぶ}」と{決|き}めておくと、{上部|じょうぶ}は{色|いろ}の{帯|おび}、{下部|かぶ}は{灰色|はいいろ}の{帯|おび}、のようにまとめて{見|み}た{目|め}を{整|ととの}えられます。', sample:[['header',[]],['main',[]],['footer',[]]]},
-  {id:'12',k:'p', n:'12',icon:'🔧', title:'{間違|まちが}いを{直|なお}す', goal:'{題名|だいめい}と{連絡先|れんらくさき}が{違|ちが}う{箱|はこ}に{入|はい}っています。{見本|みほん}と{同|おな}じになるように{直|なお}しましょう', robot:'ブロックはドラッグか ▲▼ で{別|べつ}の{箱|はこ}へ{移|うつ}せます。{右|みぎ}の{画面|がめん}がどう{変|か}わるか{見|み}てください', tray:['h1','p'], wrongFig:true, tree:true,
+  {id:'11',k:'p', n:'11',icon:'📦', title:'ページの{骨組|ほねぐ}み', goal:'3つの{箱|はこ}を{上|うえ}から{順|じゅん}に{並|なら}べましょう', robot:'{右|みぎ}の「デザインを{付|つ}ける」で、{箱|はこ}ごとに{見|み}た{目|め}が{変|か}わります。「{箱|はこ}を{表示|ひょうじ}」で{箱|はこ}の{形|かたち}も{確認|かくにん}できます', tray:BOXES, newT:BOXES, boxFig:true, tree:true,
+    why:'ページは「{上部|じょうぶ}・{主|おも}な{内容|ないよう}・{下部|かぶ}」の3つに{分|わ}けて{作|つく}るのが{基本|きほん}です。デザイン（CSS）も{箱|はこ}ごとに{付|つ}けられます。なぜ{分|わ}けるのかは、{次|つぎ}の{練習|れんしゅう}で{確|たし}かめます。', sample:[['header',[]],['main',[]],['footer',[]]]},
+  // 複数ページのサイト：ヘッダーとフッターはどのページも同じ（共通の部分）、main だけがページごとに変わる
+  {id:'site',k:'p', n:'12',icon:'📑', title:'{共通|きょうつう}の{部分|ぶぶん}', goal:'ヘッダーにサイト{名|めい}、フッターに{連絡先|れんらくさき}を{入|い}れて、3つのページを{見比|みくら}べましょう', robot:'{箱|はこ}をクリックして{選|えら}んでから「＋{追加|ついか}」します。{右|みぎ}の{画面|がめん}の{上|うえ}のタブで、3つのページを{切|き}り{替|か}えられます', tray:['h1','p'], pages:true, pagesFig:true, tree:true,
+    start:[['header',[]],['main',[['p','ようこそ。私たちの作業所のページです。']]],['footer',[]]],
+    sample:[['header',[['h1','さくら作業所']]],['main',[['p','ようこそ。私たちの作業所のページです。']]],['footer',[['p','連絡先：受付まで']]]],
+    why:'&lt;header&gt; と &lt;footer&gt; は、どのページにも{出|で}る「{共通|きょうつう}の{部分|ぶぶん}」です。Word の「ヘッダー・フッター」に{書|か}いた{題名|だいめい}やページ{番号|ばんごう}が{全|ぜん}ページに{出|で}るのと{同|おな}じです。{共通|きょうつう}の{部分|ぶぶん}を{分|わ}けておくと、1か{所|しょ}{直|なお}すだけで{全|ぜん}ページが{変|か}わります。ページごとに{変|か}わるのは &lt;main&gt; の{中身|なかみ}だけです。'},
+  {id:'12',k:'p', n:'13',icon:'🔧', title:'{間違|まちが}いを{直|なお}す', goal:'サイト{名|めい}と{連絡先|れんらくさき}が{逆|ぎゃく}の{箱|はこ}に{入|はい}っています。{見本|みほん}と{同|おな}じになるように{直|なお}しましょう', robot:'ブロックはドラッグか ▲▼ で{別|べつ}の{箱|はこ}へ{移|うつ}せます。{右|みぎ}の{画面|がめん}がどう{変|か}わるか{見|み}てください', tray:['h1','p'], wrongFig:true, tree:true,
     start:[['header',[['p','連絡先：受付まで']]],['main',[['p','はじめまして。']]],['footer',[['h1','私のページ']]]],
     sample:[['header',[['h1','私のページ']]],['main',[['p','はじめまして。']]],['footer',[['p','連絡先：受付まで']]]],
-    why:'{題名|だいめい}（&lt;h1&gt;）が &lt;footer&gt; に{入|はい}っていると、ページの{一番下|いちばんした}に{小|ちい}さな{灰色|はいいろ}の{文字|もじ}で{表示|ひょうじ}されてしまいます。タグが{正|ただ}しくても、{入|い}れる{箱|はこ}が{違|ちが}うと{伝|つた}わり{方|かた}が{変|か}わります。'},
-  {id:'13',k:'p', n:'13',icon:'📥', title:'{箱|はこ}に{入|い}れる', goal:'{見本|みほん}と{同|おな}じように、{箱|はこ}の{中|なか}にブロックを{入|い}れましょう', robot:'{箱|はこ}をクリックして{選|えら}んでから「＋{追加|ついか}」すると、その{箱|はこ}の{中|なか}に{入|はい}ります（ドラッグでも{入|い}れられます）', tray:['h1','h2','p'], start:[['header',[]],['main',[]],['footer',[]]], tree:true, sample:[['header',[['h1','私のページ']]],['main',[['p','はじめまして。']]],['footer',[['p','連絡先：受付まで']]]],
+    why:'{見|み}る{人|ひと}は「サイト{名|めい}やメニューは{一番上|いちばんうえ}、{連絡先|れんらくさき}は{一番下|いちばんした}」と{思|おも}って{探|さが}します。{逆|ぎゃく}にすると、どこに{何|なに}があるか{分|わ}からず{迷|まよ}ってしまいます（{新聞|しんぶん}の{題字|だいじ}が{一番下|いちばんした}にあったら{読|よ}みにくいのと{同|おな}じです）。また{読|よ}み{上|あ}げソフトでは、&lt;header&gt; を「いつも{同|おな}じ{部分|ぶぶん}」として{飛|と}ばし、&lt;main&gt; から{読|よ}む{使|つか}い{方|かた}もあります。'},
+  {id:'13',k:'p', n:'14',icon:'📥', title:'{箱|はこ}に{入|い}れる', goal:'{見本|みほん}と{同|おな}じように、{箱|はこ}の{中|なか}にブロックを{入|い}れましょう', robot:'{箱|はこ}をクリックして{選|えら}んでから「＋{追加|ついか}」すると、その{箱|はこ}の{中|なか}に{入|はい}ります（ドラッグでも{入|い}れられます）', tray:['h1','h2','p'], start:[['header',[]],['main',[]],['footer',[]]], tree:true, sample:[['header',[['h1','私のページ']]],['main',[['p','はじめまして。']]],['footer',[['p','連絡先：受付まで']]]],
     why:'{同|おな}じ &lt;p&gt; でも、&lt;main&gt; に{入|い}れると{本文|ほんぶん}、&lt;footer&gt; に{入|い}れるとページの{下|した}の{小|ちい}さな{文字|もじ}になります。{何|なに}を{伝|つた}えたい{部分|ぶぶん}かで、{入|い}れる{箱|はこ}を{選|えら}びます。'},
-  {id:'14',k:'p', n:'14',icon:'🏗️', title:'{箱|はこ}で{組|く}み{立|た}て', goal:'{箱|はこ}を{使|つか}って、{見本|みほん}と{同|おな}じページを{作|つく}りましょう', robot:'まず{箱|はこ}を{並|なら}べて、それから{中身|なかみ}を{入|い}れると{作|つく}りやすいです', tray:BOXES.concat(['h1','h2','p','img','ul']), cmp:true, tree:true, sample:[['header',[['h1','私のページ']]],['main',[['h2','自己紹介'],['p','はじめまして。'],['h2','好きなもの'],['ul',['散歩','音楽','料理']]]],['footer',[['p','連絡先：受付まで']]]],
+  {id:'14',k:'p', n:'15',icon:'🏗️', title:'{箱|はこ}で{組|く}み{立|た}て', goal:'{箱|はこ}を{使|つか}って、{見本|みほん}と{同|おな}じページを{作|つく}りましょう', robot:'まず{箱|はこ}を{並|なら}べて、それから{中身|なかみ}を{入|い}れると{作|つく}りやすいです', tray:BOXES.concat(['h1','h2','p','img','ul']), cmp:true, tree:true, sample:[['header',[['h1','私のページ']]],['main',[['h2','自己紹介'],['p','はじめまして。'],['h2','好きなもの'],['ul',['散歩','音楽','料理']]]],['footer',[['p','連絡先：受付まで']]]],
     why:'{箱|はこ}で{分|わ}けておくと、デザインで{見|み}た{目|め}を{整|ととの}えやすくなるだけでなく、{読|よ}み{上|あ}げソフトや{検索|けんさく}サイトも「&lt;main&gt; が{大事|だいじ}な{内容|ないよう}」と{分|わ}かります。Progate の CSS では、この{箱|はこ}ごとに{見|み}た{目|め}を{決|き}めていきます。'},
   {id:'A', k:'c', n:'A', icon:'✅', title:'{見本|みほん}の{再現|さいげん}', goal:'{見本|みほん}と{同|おな}じページを{作|つく}りましょう', robot:'{見本|みほん}と{見比|みくら}べて{確認|かくにん}しましょう', tray:ALL, cmp:true, target:'sample', sample:[['h1','動物図鑑'],['img','cat'],['p','ねこはかわいい。'],['h2','好きなところ'],['p','ふわふわしています。']]},
   {id:'B', k:'c', n:'B', icon:'🏆', title:'{応用|おうよう}', goal:'{見本|みほん}と{同|おな}じページを{作|つく}りましょう', robot:'{見本|みほん}と{見比|みくら}べて{確認|かくにん}しましょう', tray:ALL, cmp:true, target:'sample', sample:[['h1','私の1日'],['img','onigiri'],['p','朝はおにぎりです。'],['hr'],['h2','好きなこと'],['ul',['散歩','読書','お絵かき']],['strong','毎日楽しいです！']]},
@@ -675,13 +688,26 @@ const STAGES = [
     {line:'<hr>', re:/^<hr\s*\/?>$/i, say:'{区切|くぎ}り{線|せん}（&lt;hr&gt;）を{入|い}れましょう'},
     {line:'<img src="ねこ.svg" alt="ねこ">', re:/^<img\s+src="[^"<>]+"\s+alt="[^"<>]*"\s*\/?>$/i, say:'ねこの{画像|がぞう}を{表示|ひょうじ}しましょう（src は "ねこ.svg"、alt は "ねこ"）'}]}
 ];
+// 「共通の部分」の練習で見せる3つのページ。main 以外（ヘッダー・フッター）は自分で作ったものがどのページにも出る
+const PAGES = [
+  {name:'トップ', file:'index.html'},
+  {name:'自己紹介', file:'about.html', main:[['h2','自己紹介'],['p','パンやお菓子を作っています。']]},
+  {name:'お問い合わせ', file:'contact.html', main:[['h2','お問い合わせ'],['p','見学はいつでも受け付けています。']]}
+];
+// 今見ているページのブロック（トップは自分で並べたもの。ほかのページは main の中身だけ差し替える）
+function viewBlocks(){
+  const pg = PAGES[S.page];
+  if (!cur().pages || !pg.main) return S.blocks;
+  if (!pg.blocks) pg.blocks = mk(pg.main);
+  return S.blocks.map(b => b.type === 'main' ? Object.assign({}, b, {kids:pg.blocks}) : b);
+}
 const cardLabel = st => ({p:'練習 ', c:'確認 ', t:'タイピング '})[st.k] + st.n;
 const targetOf = st => st.target === 'sample' ? st.sample.map(x => x[0]) : st.target;
 const isUnlocked = i => STAGES[i].k === 'p' || !!prog.cleared['10'];
 
 /* ===================== 状態 ===================== */
 // into：「＋追加」したブロックが入る箱の id（null なら一番外側の最後）
-const S = {screen:'select', idx:0, blocks:[], undo:[], fails:0, hl:null, flashId:null, editSnap:false, strip:'', into:null};
+const S = {screen:'select', idx:0, blocks:[], undo:[], fails:0, hl:null, flashId:null, editSnap:false, strip:'', into:null, boxes:false};
 const cur = () => STAGES[S.idx];
 
 /* ===================== HTML を作る ===================== */
@@ -707,7 +733,7 @@ function pvHTML(blocks, withIds){
 // デザイン（実際のサイトのような見た目）は、箱を使う練習のときだけ付ける
 const useDesign = () => prog.design && S.screen === 'stage' && !!cur().tree;
 function browserHTML(inner, id, bar){
-  return '<div class="browser"><div class="bbar"><i></i><i></i><i></i>' + (bar || '') + '</div><div class="pv' + (prog.boxes ? ' boxes' : '') + (useDesign() ? ' design' : '') + '"' + (id ? ' id="' + id + '"' : '') + '>' + inner + '</div></div>';
+  return '<div class="browser"><div class="bbar"><i></i><i></i><i></i>' + (bar || '') + '</div><div class="pv' + (S.boxes ? ' boxes' : '') + (useDesign() ? ' design' : '') + '"' + (id ? ' id="' + id + '"' : '') + '>' + inner + '</div></div>';
 }
 /* ブロックの顔はコードそのもの。slot(欄の名前) が入力欄（パレットでは黄色の空欄）を返す。
    data-tag を付けた部分にマウスを合わせると説明、クリックすると使用例が出る */
@@ -785,7 +811,8 @@ function openStage(i){
   hideTip();
   const st = cur();
   S.blocks = mk(st.start); S.undo = []; S.fails = 0; S.hl = null; S.strip = ''; S.into = null;
-  if (st.showBoxes && !prog.boxes){ prog.boxes = true; saveProg(); }   // 箱を初めて使う練習では、箱を表示しておく
+  S.boxes = false;   // 「箱を表示」は、ステージを開くたびにオフから始める
+  S.page = 0; S.seen = [0];   // 共通の部分の練習：見ているページと、見たページ
   $('#backBtn').hidden = false;
   $('#topTitle').innerHTML = cardLabel(st) + ' <span aria-hidden="true">' + st.icon + '</span> ' + fu(st.title);
   // 縦3列：左＝お題（お題・見本・ヒント）／真ん中＝ブロック／右＝画面
@@ -813,10 +840,11 @@ function openStage(i){
         '<h2 class="ph"><span class="phico" aria-hidden="true">🖥</span><span>' + fu('{画面|がめん}') + '</span>' +
           '<span class="vtabs" role="tablist"><button class="vtab" role="tab" data-view="pv" aria-selected="true">🖥 ブラウザ</button>' +
           '<button class="vtab" role="tab" data-view="code" aria-selected="false"><span class="ti">&lt;/&gt;</span> コード</button></span></h2>' +
+        (st.pages ? '<div class="pgtabs" role="tablist" aria-label="ページ">' + PAGES.map((p, i) => '<button class="pgtab' + (i === 0 ? ' seen' : '') + '" role="tab" data-pg="' + i + '" aria-selected="' + (i === 0) + '">📄 ' + p.name + '</button>').join('') + '</div>' : '') +
         '<div id="viewWrap">' + browserHTML('', 'pv',
           (st.tree ? '<label class="boxtgl"><input type="checkbox" id="designChk"' + (prog.design ? ' checked' : '') + '><span>' + fu('デザインを{付|つ}ける') + '</span></label>' : '') +
-          '<label class="boxtgl"><input type="checkbox" id="boxChk"' + (prog.boxes ? ' checked' : '') + '><span>' + fu('{箱|はこ}を{表示|ひょうじ}') + '</span></label>') +
-          '<div class="editor" hidden><div class="ebar"><span class="etab">index.html</span></div><div class="ecode" id="codeV"></div></div>' +
+          '<label class="boxtgl"><input type="checkbox" id="boxChk"' + (S.boxes ? ' checked' : '') + '><span>' + fu('{箱|はこ}を{表示|ひょうじ}') + '</span></label>') +
+          '<div class="editor" hidden><div class="ebar"><span class="etab" id="etab">index.html</span></div><div class="ecode" id="codeV"></div></div>' +
         '</div>' +
       '</section>' +
     '</div>' +
@@ -847,10 +875,21 @@ function bindStage(){
   if ($('#skipBtn')) $('#skipBtn').addEventListener('click', goNext);
   // 箱を表示：見本と自分の画面の両方に、要素の枠とタグ名を出す
   $('#boxChk').addEventListener('change', e => {
-    prog.boxes = e.target.checked; saveProg();
-    $$('#app .pv').forEach(v => v.classList.toggle('boxes', prog.boxes));
+    S.boxes = e.target.checked;
+    $$('#app .pv').forEach(v => v.classList.toggle('boxes', S.boxes));
     fitSample();
   });
+  // ページの切り替え（共通の部分の練習）：ヘッダー・フッターはそのまま、main だけが変わる
+  $$('.pgtab').forEach(t => t.addEventListener('click', () => {
+    S.page = +t.dataset.pg;
+    if (S.seen.indexOf(S.page) < 0) S.seen.push(S.page);
+    $$('.pgtab').forEach(x => {
+      x.setAttribute('aria-selected', x === t);
+      x.classList.toggle('seen', S.seen.indexOf(+x.dataset.pg) >= 0);
+      x.classList.remove('glow');
+    });
+    renderPreview(); setHL(S.hl);
+  }));
   // デザインを付ける：箱ごとに見た目が決まる（上部は色の帯、下部は灰色の小さな文字）
   if ($('#designChk')) $('#designChk').addEventListener('change', e => {
     prog.design = e.target.checked; saveProg();
@@ -979,7 +1018,8 @@ function blkHTML(b, no){
 }
 function renderPreview(){
   const pv = $('#pv');
-  pv.innerHTML = S.blocks.length ? pvHTML(S.blocks, true) : '<div class="pvempty">' + fu('（まだ{何|なに}もありません）') + '</div>';
+  const V = viewBlocks();
+  pv.innerHTML = V.length ? pvHTML(V, true) : '<div class="pvempty">' + fu('（まだ{何|なに}もありません）') + '</div>';
   if (S.flashId){ const f = $('[data-id="' + S.flashId + '"]', pv); if (f) f.classList.add('flash'); }
   renderCodeV();
 }
@@ -987,7 +1027,8 @@ const unesc = s => s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;
 // 右の「コード」：本物のエディタのように、行番号付きでファイル全体を表示。ブロックごとの行に data-id を付けて連動させる
 function renderCodeV(){
   const el = $('#codeV'); if (!el) return;
-  const L = pageLines(S.blocks, false);
+  const V = viewBlocks(), L = pageLines(V, false);
+  if (cur().pages) $('#etab').textContent = PAGES[S.page].file;   // 見ているページのファイル名
   let n = 0;
   const line = raw => '<span class="eln"><span class="lnno">' + (++n) + '</span><span class="ltx">' + hlCode(raw) + '</span></span>';
   // 箱は「開始タグの行・中身のブロック・終了タグの行」に分け、中身も1つずつ連動できるようにする
@@ -995,7 +1036,7 @@ function renderCodeV(){
     (b.kids ? line(ind + '<' + b.type + '>') + b.kids.map(k => blk(k, ind + '  ')).join('') + line(ind + '</' + b.type + '>')
             : blockLines(b, false).map(l => line(unesc(ind + l))).join('')) + '</span>';
   el.innerHTML = L.head.map(l => line(unesc(l))).join('') +
-    S.blocks.map(b => blk(b, '    ')).join('') +
+    V.map(b => blk(b, '    ')).join('') +
     L.foot.map(l => line(unesc(l))).join('');
 }
 function renderKinds(){
@@ -1367,6 +1408,13 @@ function judge(){
     const e = $$('#work .blk')[ei].querySelector('.inp.empty'); if (e) e.focus({preventScroll:true});
     return;
   }
+  // 共通の部分の練習：3つのページを全部見てから正解にする
+  if (st.pages && S.seen.length < PAGES.length){
+    shakeDone();
+    setBubble(fu('{形|かたち}は{正|ただ}しいです！{右|みぎ}の{画面|がめん}の{上|うえ}のタブで、まだ{見|み}ていないページも{見|み}てみましょう'), true);
+    $$('.pgtab').forEach(t => { if (S.seen.indexOf(+t.dataset.pg) < 0) t.classList.add('glow'); });
+    return;
+  }
   success();
 }
 
@@ -1455,8 +1503,8 @@ function showIntro(){
     (st.wrongFig
       // 間違ったページと正しいページを並べて、箱が違うと見た目がどう変わるかを見せる
       ? '<div class="cmpgrid wrongfig"><div><h3>✕ ' + fu('{今|いま}のページ') + '</h3>' + browserHTML(pvHTML(mk(st.start))) + '</div><div><h3>○ ' + fu('{正|ただ}しいページ') + '</h3>' + browserHTML(pvHTML(mk(st.sample))) + '</div></div>' +
-        '<div class="cap">' + fu('{題名|だいめい}が &lt;footer&gt; に{入|はい}っているので、{一番下|いちばんした}の{小|ちい}さな{文字|もじ}になっています') + '</div>'
-      : '<div class="ibig">' + browserHTML(pvHTML(mk(st.sample))) + '</div>');
+        '<div class="cap">' + fu('サイト{名|めい}が{一番下|いちばんした}、{連絡先|れんらくさき}が{一番上|いちばんうえ}にあると、{見|み}る{人|ひと}はサイト{名|めい}を{探|さが}して{迷|まよ}ってしまいます') + '</div>'
+      : st.pagesFig ? '' : '<div class="ibig">' + browserHTML(pvHTML(mk(st.sample))) + '</div>');
   if (st.box){
     h += '<div class="boxfig" aria-hidden="true"><div class="lid o">&lt;h1&gt;<small>' + fu('{開始|かいし}タグ') + '</small></div><div class="mid">私のページ</div><div class="lid c">&lt;/h1&gt;<small>' + fu('{終了|しゅうりょう}タグ') + '</small></div></div>' +
       '<div class="cap">' + fu('&lt;h1&gt; と &lt;/h1&gt; で{囲|かこ}んだ{文字|もじ}が{見出|みだ}しになります') + '</div>';
@@ -1466,6 +1514,15 @@ function showIntro(){
     const row = (t, cap) => '<div class="pgbox" style="' + colVars(t) + '"><span class="ct">' + shortTag(t) + '</span><span>' + fu(cap) + '</span></div>';
     h += '<div class="newp"><div class="pgfig">' + row('header', 'ページの{上部|じょうぶ}：{題名|だいめい}やメニュー') + row('main', 'ページの{主|おも}な{内容|ないよう}：{伝|つた}えたいこと') + row('footer', 'ページの{下部|かぶ}：{連絡先|れんらくさき}など') + '</div>' +
       '<div class="cap">' + fu('{多|おお}くのWebページは、この3つの{箱|はこ}でできています。{箱|はこ}は{画面|がめん}には{見|み}えませんが、{中身|なかみ}をまとめる{役割|やくわり}があります') + '</div></div>';
+  }
+  if (st.pagesFig){
+    // 3つのページを並べて、上と下が同じことを見せる
+    const smp = mk(st.sample);
+    h += '<div class="newp"><div class="pagesfig">' + PAGES.map(pg => {
+      const bl = pg.main ? smp.map(b => b.type === 'main' ? Object.assign({}, b, {kids:mk(pg.main)}) : b) : smp;
+      return '<div><h3>📄 ' + pg.name + '</h3>' + browserHTML(pvHTML(bl)) + '</div>';
+    }).join('') + '</div>' +
+      '<div class="cap">' + fu('{上|うえ}（ヘッダー）と{下|した}（フッター）は、どのページも{同|おな}じです。{変|か}わるのは{真|ま}ん{中|なか}（&lt;main&gt;）だけです。<br>Word の「ヘッダー・フッター」が{全|ぜん}ページに{出|で}るのと{同|おな}じ{考|かんが}え{方|かた}です') + '</div></div>';
   }
   if (st.newT) h += st.newT.map(newPartHTML).join('');
   if (st.orderFig){
